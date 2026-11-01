@@ -1,0 +1,93 @@
+{
+  "model_name": "Aushadham Multi-Horizon Demand Forecaster",
+  "algorithm": "RandomForest",
+  "version": "1.0.0",
+  "trained_at": "2026-11-01T13:36:11.523392",
+  "train_samples": 4494,
+  "validation_samples": 963,
+  "test_samples": 963,
+  "feature_columns": [
+    "lag_1",
+    "lag_2",
+    "lag_3",
+    "lag_7",
+    "lag_14",
+    "rolling_mean_7",
+    "rolling_std_7",
+    "rolling_mean_14",
+    "rolling_mean_30",
+    "velocity_ratio",
+    "closing_stock",
+    "days_of_supply",
+    "supplier_lead_time",
+    "safety_stock",
+    "day_of_week",
+    "month",
+    "is_weekend"
+  ],
+  "target_horizons": [
+    "7_day",
+    "14_day",
+    "30_day"
+  ],
+  "validation_metrics": {
+    "target_demand_7d": {
+      "mae": 15.3,
+      "rmse": 20.69,
+      "wape": 0.1001,
+      "wape_pct": 10.01
+    },
+    "target_demand_14d": {
+      "mae": 22.58,
+      "rmse": 30.85,
+      "wape": 0.0748,
+      "wape_pct": 7.48
+    },
+    "target_demand_30d": {
+      "mae": 44.49,
+      "rmse": 62.19,
+      "wape": 0.069,
+      "wape_pct": 6.9
+    }
+  },
+  "test_metrics": {
+    "target_demand_7d": {
+      "mae": 16.39,
+      "rmse": 23.55,
+      "wape": 0.1084,
+      "wape_pct": 10.84
+    },
+    "target_demand_14d": {
+      "mae": 27.17,
+      "rmse": 40.12,
+      "wape": 0.0896,
+      "wape_pct": 8.96
+    },
+    "target_demand_30d": {
+      "mae": 42.19,
+      "rmse": 61.12,
+      "wape": 0.0656,
+      "wape_pct": 6.56
+    }
+  },
+  "feature_importance_7d": {
+    "rolling_mean_30": 0.5348,
+    "rolling_mean_14": 0.3711,
+    "rolling_mean_7": 0.0188,
+    "safety_stock": 0.0158,
+    "rolling_std_7": 0.0145,
+    "velocity_ratio": 0.0085,
+    "supplier_lead_time": 0.0072,
+    "month": 0.0066,
+    "days_of_supply": 0.0047,
+    "closing_stock": 0.0041,
+    "lag_14": 0.0031,
+    "lag_7": 0.0027,
+    "lag_1": 0.0026,
+    "lag_2": 0.0026,
+    "lag_3": 0.0019,
+    "day_of_week": 0.0011,
+    "is_weekend": 0.0001
+  },
+  "model_file": "demand_forecast_model.joblib"
+}

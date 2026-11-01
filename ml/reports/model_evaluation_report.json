@@ -1,0 +1,44 @@
+{
+  "report_generated_at": "2026-11-01T13:38:14.965301",
+  "test_dataset_size": 963,
+  "demand_forecast": {
+    "algorithm": "RandomForest",
+    "version": "1.0.0",
+    "horizons": {
+      "7_day": {
+        "target": "target_demand_7d",
+        "mae": 16.39,
+        "rmse": 23.55,
+        "wape": 0.1084,
+        "wape_percentage": 10.84
+      },
+      "14_day": {
+        "target": "target_demand_14d",
+        "mae": 27.17,
+        "rmse": 40.12,
+        "wape": 0.0896,
+        "wape_percentage": 8.96
+      },
+      "30_day": {
+        "target": "target_demand_30d",
+        "mae": 42.19,
+        "rmse": 61.12,
+        "wape": 0.0656,
+        "wape_percentage": 6.56
+      }
+    },
+    "mean_wape_percentage": 8.79
+  },
+  "stockout_prediction": {
+    "algorithm": "RandomForestRegressor + Classifier",
+    "days_mae": 0.02,
+    "days_rmse": 0.16,
+    "risk_accuracy_percentage": 99.9,
+    "risk_f1_weighted": 0.999
+  },
+  "anomaly_detection": {
+    "algorithm": "IsolationForest",
+    "test_anomalies_detected": 17,
+    "anomaly_rate_percentage": 1.77
+  }
+}

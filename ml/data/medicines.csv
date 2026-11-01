@@ -1,0 +1,13 @@
+medicine_id,name,generic_name,category,strength,dosage_form,pack_size,mrp,selling_price,purchase_price,lead_time_days,safety_stock,base_daily_demand,seasonality
+med-pcm-500,Paracetamol 500mg,Paracetamol / Acetaminophen,Analgesics / Antipyretics,500 mg,Tablet,10 tablets / strip,30.0,25.0,15.0,4,25,12,monsoon_winter
+med-pcm-650,Paracetamol 650mg,Paracetamol,Analgesics / Antipyretics,650 mg,Tablet,15 tablets / strip,35.0,31.0,18.0,3,20,18,monsoon_winter
+med-azi-500,Azithromycin 500mg,Azithromycin,Antibiotics,500 mg,Tablet,3 tablets / strip,120.0,105.0,70.0,5,15,6,winter
+med-amox-cv-625,Augmentin 625 Duo,Amoxicillin + Clavulanic Acid,Antibiotics,625 mg,Tablet,10 tablets / strip,210.0,189.0,130.0,4,18,9,monsoon_winter
+med-cet-10,Cetirizine 10mg,Cetirizine Hydrochloride,Antihistamines / Anti-Allergy,10 mg,Tablet,10 tablets / strip,22.0,18.0,9.0,2,20,14,spring_monsoon
+med-pan-40,Pantoprazole 40mg,Pantoprazole Gastro-resistant,Gastrointestinal / Antacids,40 mg,Tablet,10 tablets / strip,95.0,82.0,48.0,3,22,15,none
+med-met-500,Metformin 500mg SR,Metformin Hydrochloride,Diabetes Management,500 mg,Tablet,20 tablets / strip,45.0,38.0,22.0,4,30,22,none
+med-tel-40,Telmisartan 40mg,Telmisartan,Cardiovascular / Hypertension,40 mg,Tablet,15 tablets / strip,115.0,98.0,58.0,3,25,16,none
+med-ator-10,Atorvastatin 10mg,Atorvastatin Calcium,Cardiovascular / Statins,10 mg,Tablet,15 tablets / strip,135.0,118.0,70.0,4,20,13,none
+med-cough-syp,Ascoril-D Cough Syrup,Dextromethorphan + Chlorpheniramine + Phenylephrine,Respiratory / Cough Syrups,100 ml,Syrup,1 bottle (100ml),138.0,122.0,82.0,5,15,8,monsoon_winter
+med-ors-sachet,Electral ORS Powder,Oral Rehydration Salts (WHO formula),Nutrition / Electrolytes,21.8 g,Powder,Sachet (1 liter solution),22.5,20.0,12.0,2,35,25,summer
+med-ibu-400,Brufen 400mg,Ibuprofen,Analgesics / NSAID,400 mg,Tablet,15 tablets / strip,28.0,24.0,14.0,3,20,10,none

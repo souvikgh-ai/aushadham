@@ -1,0 +1,20 @@
+{
+  "model_name": "Aushadham Inventory Anomaly Detector",
+  "algorithm": "IsolationForest",
+  "version": "1.0.0",
+  "trained_at": "2026-11-01T13:37:42.576571",
+  "train_samples": 4494,
+  "test_samples": 963,
+  "features": [
+    "units_sold",
+    "rolling_mean_7",
+    "rolling_std_7",
+    "rolling_mean_30",
+    "velocity_ratio",
+    "closing_stock",
+    "days_of_supply"
+  ],
+  "contamination": 0.04,
+  "test_detected_anomalies": 17,
+  "test_anomaly_rate_pct": 1.77
+}

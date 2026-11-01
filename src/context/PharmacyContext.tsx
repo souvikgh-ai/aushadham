@@ -12,7 +12,9 @@ import type {
   Alert,
   DemandForecast,
   InventoryStatus,
-  DosageForm
+  DosageForm,
+  UserRole,
+  UserProfile
 } from '../types/pharmacy';
 import { StorageService } from '../services/storageService';
 import { 
@@ -29,19 +31,27 @@ import {
 import confetti from 'canvas-confetti';
 
 export type NavigationPage = 
+  | 'overview'
+  | 'inventory'
+  | 'pos_sales'
+  | 'ai_intelligence'
+  | 'procurement'
+  | 'network'
+  | 'reservations'
+  | 'reports'
+  | 'settings'
+  | 'discovery'
+  // Legacy aliases for backward compatibility
   | 'dashboard' 
   | 'pos' 
   | 'medicines' 
-  | 'inventory' 
   | 'expiry' 
   | 'recommendations' 
   | 'forecast' 
   | 'sales' 
   | 'po' 
   | 'suppliers' 
-  | 'alerts' 
-  | 'reports' 
-  | 'settings';
+  | 'alerts';
 
 interface PharmacyContextType {
   // Navigation & UI state
@@ -49,6 +59,17 @@ interface PharmacyContextType {
   setActivePage: (page: NavigationPage) => void;
   selectedMedicineDetail: Medicine | null;
   setSelectedMedicineDetail: (medicine: Medicine | null) => void;
+  
+  // Authentication & RBAC state
+  isAuthenticated: boolean;
+  login: (user: UserProfile) => void;
+  logout: () => void;
+  userRole: UserRole;
+  setUserRole: (role: UserRole) => void;
+  currentUser: UserProfile;
+  setCurrentUser: (user: UserProfile) => void;
+  isAuthModalOpen: boolean;
+  setIsAuthModalOpen: (open: boolean) => void;
   
   // Data State
   medicines: Medicine[];
@@ -167,6 +188,70 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [activePage, setActivePage] = useState<NavigationPage>('dashboard');
   const [selectedMedicineDetail, setSelectedMedicineDetail] = useState<Medicine | null>(null);
   const [quickOrderPrefill, setQuickOrderPrefill] = useState<{ medicineId?: string; supplierId?: string; quantity?: number } | null>(null);
+
+  // Authentication & Role State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+  const [userRole, setUserRoleState] = useState<UserRole>(() => {
+    return (localStorage.getItem('aushadham_user_role') as UserRole) || 'pharmacy_owner';
+  });
+
+  const [currentUser, setCurrentUserState] = useState<UserProfile>(() => {
+    const saved = localStorage.getItem('aushadham_user_profile');
+    if (saved) {
+      try { return JSON.parse(saved); } catch {}
+    }
+    return {
+      id: 'usr-default-owner',
+      name: 'Ramesh Sharma',
+      email: 'owner@aushadham.in',
+      phone: '+91 98450 12001',
+      role: 'pharmacy_owner',
+      pharmacyId: 'pharm_indiranagar',
+      address: '100ft Road, Indiranagar, Bengaluru'
+    };
+  });
+
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const login = useCallback((user: UserProfile) => {
+    setCurrentUserState(user);
+    setUserRoleState(user.role);
+    setIsAuthenticated(true);
+    localStorage.setItem('aushadham_user_role', user.role);
+    localStorage.setItem('aushadham_user_profile', JSON.stringify(user));
+    if (user.role === 'customer') {
+      setActivePage('discovery');
+    } else {
+      setActivePage('dashboard');
+    }
+  }, []);
+
+  const logout = useCallback(() => {
+    setIsAuthenticated(false);
+  }, []);
+
+  const setUserRole = useCallback((role: UserRole) => {
+    setUserRoleState(role);
+    localStorage.setItem('aushadham_user_role', role);
+    if (role === 'customer') {
+      setActivePage('discovery');
+    } else {
+      setActivePage('dashboard');
+    }
+  }, []);
+
+  const setCurrentUser = useCallback((user: UserProfile) => {
+    setCurrentUserState(user);
+    setUserRoleState(user.role);
+    localStorage.setItem('aushadham_user_role', user.role);
+    localStorage.setItem('aushadham_user_profile', JSON.stringify(user));
+    if (user.role === 'customer') {
+      setActivePage('discovery');
+    } else {
+      setActivePage('dashboard');
+    }
+  }, []);
 
   // Initialize storage
   const [medicines, setMedicines] = useState<Medicine[]>([]);
@@ -404,6 +489,22 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       });
     } catch {
       // Non-critical
+    }
+
+    // Real-time synchronization to Central Discovery Network
+    if (result.newSale?.items) {
+      result.newSale.items.forEach(item => {
+        fetch('/api/inventory/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pharmacy_id: 'pharm_indiranagar',
+            medicine_id: item.medicineId,
+            quantity_change: -item.quantity,
+            reason: 'POS_SALE'
+          })
+        }).catch(err => console.warn('Sync failed:', err));
+      });
     }
 
     return { success: true, sale: result.newSale };
@@ -693,6 +794,18 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     StorageService.saveBatches(updatedBatches);
     StorageService.saveMedicines(updatedMeds);
     StorageService.saveInventoryTransactions(updatedTxs);
+
+    // Synchronize to Central API Store
+    fetch('/api/inventory/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pharmacy_id: 'pharm_indiranagar',
+        medicine_id: targetMed.id,
+        quantity_change: actualChange,
+        reason: type
+      })
+    }).catch(err => console.warn('Sync failed:', err));
   }, [batches, medicines, inventoryTransactions]);
 
   // Update Settings
@@ -744,6 +857,15 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setActivePage,
       selectedMedicineDetail,
       setSelectedMedicineDetail,
+      isAuthenticated,
+      login,
+      logout,
+      userRole,
+      setUserRole,
+      currentUser,
+      setCurrentUser,
+      isAuthModalOpen,
+      setIsAuthModalOpen,
       medicines,
       batches,
       suppliers,

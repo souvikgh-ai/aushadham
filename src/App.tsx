@@ -3,53 +3,99 @@ import { PharmacyProvider, usePharmacy } from './context/PharmacyContext';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { MedicineDetailModal } from './components/MedicineDetailModal';
+import { RoleLoginModal } from './components/RoleLoginModal';
 
 // Pages
+import { LandingLoginPage } from './pages/LandingLoginPage';
+import { CustomerDiscoveryPage } from './pages/CustomerDiscoveryPage';
 import { DashboardPage } from './pages/DashboardPage';
-import { PosBillingPage } from './pages/PosBillingPage';
-import { MedicinesPage } from './pages/MedicinesPage';
-import { InventoryPage } from './pages/InventoryPage';
-import { ExpiryMonitorPage } from './pages/ExpiryMonitorPage';
-import { RecommendationsPage } from './pages/RecommendationsPage';
-import { DemandForecastPage } from './pages/DemandForecastPage';
-import { SalesHistoryPage } from './pages/SalesHistoryPage';
-import { PurchaseOrdersPage } from './pages/PurchaseOrdersPage';
-import { SuppliersPage } from './pages/SuppliersPage';
-import { AlertCenterPage } from './pages/AlertCenterPage';
+import { ConsolidatedInventoryPage } from './pages/ConsolidatedInventoryPage';
+import { ConsolidatedPosPage } from './pages/ConsolidatedPosPage';
+import { ConsolidatedAIPage } from './pages/ConsolidatedAIPage';
+import { ConsolidatedProcurementPage } from './pages/ConsolidatedProcurementPage';
+import { PharmacyNetworkPage } from './pages/PharmacyNetworkPage';
+import { CustomerRequestsPage } from './pages/CustomerRequestsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
 
 const AppContent: React.FC = () => {
-  const { activePage, selectedMedicineDetail, setSelectedMedicineDetail } = usePharmacy();
+  const { 
+    activePage, 
+    selectedMedicineDetail, 
+    setSelectedMedicineDetail,
+    isAuthenticated,
+    login,
+    userRole,
+    setUserRole,
+    currentUser,
+    setCurrentUser,
+    isAuthModalOpen,
+    setIsAuthModalOpen
+  } = usePharmacy();
+
+  // Whenever user opens website or logs out, land on the Login & Demo page
+  if (!isAuthenticated) {
+    return <LandingLoginPage onLogin={login} />;
+  }
 
   const renderActivePage = () => {
+    // Strict RBAC: Patients access Customer Discovery
+    if (userRole === 'customer') {
+      return <CustomerDiscoveryPage />;
+    }
+
+    // Consolidated Pharmacy Owner Architecture (9 Parts)
     switch (activePage) {
+      // 1. OVERVIEW
+      case 'overview':
       case 'dashboard':
         return <DashboardPage />;
-      case 'pos':
-        return <PosBillingPage />;
-      case 'medicines':
-        return <MedicinesPage />;
+
+      // 2. INVENTORY (Catalogue, Batches, Expiry, Movements)
       case 'inventory':
-        return <InventoryPage />;
+      case 'medicines':
       case 'expiry':
-        return <ExpiryMonitorPage />;
-      case 'recommendations':
-        return <RecommendationsPage />;
-      case 'forecast':
-        return <DemandForecastPage />;
+        return <ConsolidatedInventoryPage />;
+
+      // 3. POS & SALES (POS Billing, Sales History & Invoices)
+      case 'pos_sales':
+      case 'pos':
       case 'sales':
-        return <SalesHistoryPage />;
-      case 'po':
-        return <PurchaseOrdersPage />;
-      case 'suppliers':
-        return <SuppliersPage />;
+        return <ConsolidatedPosPage />;
+
+      // 4. AI INTELLIGENCE (Forecast, Stockout, Replenish, XAI, Seasonal, Anomalies)
+      case 'ai_intelligence':
+      case 'forecast':
+      case 'recommendations':
       case 'alerts':
-        return <AlertCenterPage />;
+        return <ConsolidatedAIPage />;
+
+      // 5. PROCUREMENT (Purchase Orders, Delivery Receiving, Suppliers, Reorder)
+      case 'procurement':
+      case 'po':
+      case 'suppliers':
+        return <ConsolidatedProcurementPage />;
+
+      // 6. PHARMACY NETWORK (Inter-Pharmacy Stock Transfers, Surplus Matchmaker)
+      case 'network':
+        return <PharmacyNetworkPage />;
+
+      // 7. CUSTOMER REQUESTS (Medicine Reservations & Pickup Lifecycle)
+      case 'reservations':
+        return <CustomerRequestsPage />;
+
+      // 8. REPORTS (Analytics & Reports)
       case 'reports':
         return <ReportsPage />;
+
+      // 9. SETTINGS (Pharmacy Profile & Preferences)
       case 'settings':
         return <SettingsPage />;
+
+      // Customer preview if accessed
+      case 'discovery':
+        return <CustomerDiscoveryPage />;
+
       default:
         return <DashboardPage />;
     }
@@ -57,12 +103,12 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden font-sans">
-      {/* 13-item Sidebar */}
+      {/* Consolidated Sidebar */}
       <Sidebar />
 
       {/* Main Body Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Top Header */}
+        {/* Streamlined Top Header */}
         <Header />
 
         {/* Scrollable View Area */}
@@ -71,21 +117,36 @@ const AppContent: React.FC = () => {
         </main>
       </div>
 
-      {/* Global Medicine Detail Modal */}
-      <MedicineDetailModal
-        medicine={selectedMedicineDetail}
-        onClose={() => setSelectedMedicineDetail(null)}
+      {/* Medicine Quick View Modal */}
+      {selectedMedicineDetail && (
+        <MedicineDetailModal
+          medicine={selectedMedicineDetail}
+          onClose={() => setSelectedMedicineDetail(null)}
+        />
+      )}
+
+      {/* Role Switch & Sign In Modal */}
+      <RoleLoginModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        currentUser={currentUser}
+        onSwitchRole={(role) => setUserRole(role)}
+        onLoginSuccess={(user) => {
+          setCurrentUser(user);
+          setUserRole(user.role);
+          setIsAuthModalOpen(false);
+        }}
       />
     </div>
   );
 };
 
-export function App() {
+export const App: React.FC = () => {
   return (
     <PharmacyProvider>
       <AppContent />
     </PharmacyProvider>
   );
-}
+};
 
 export default App;

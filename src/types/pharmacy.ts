@@ -239,3 +239,247 @@ export interface CartItem {
   quantity: number;
   discountPercent: number;
 }
+
+export type UserRole = 'customer' | 'pharmacy_owner';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: UserRole;
+  pharmacyId?: string; // If pharmacy owner
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  address?: string;
+}
+
+export interface NearbyPharmacy {
+  pharmacy_id: string;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  phone: string;
+  rating: number;
+  verified: boolean;
+  distance_km: number;
+  medicine_stock?: {
+    medicine_id: string;
+    quantity: number;
+    in_stock: boolean;
+    stock_status: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
+    last_updated: string;
+  };
+}
+
+export interface MLModelMetrics {
+  report_generated_at: string;
+  test_dataset_size: number;
+  demand_forecast: {
+    algorithm: string;
+    version: string;
+    horizons: {
+      [key: string]: {
+        target: string;
+        mae: number;
+        rmse: number;
+        wape: number;
+        wape_percentage: number;
+      };
+    };
+    mean_wape_percentage: number;
+  };
+  stockout_prediction: {
+    algorithm: string;
+    days_mae: number;
+    days_rmse: number;
+    risk_accuracy_percentage: number;
+    risk_f1_weighted: number;
+  };
+  anomaly_detection: {
+    algorithm: string;
+    test_anomalies_detected: number;
+    anomaly_rate_percentage: number;
+  };
+}
+
+export interface MLForecastResult {
+  forecast_7d: number;
+  forecast_14d: number;
+  forecast_30d: number;
+  model_version: string;
+  algorithm: string;
+  inference_mode: string;
+  medicine_id?: string;
+}
+
+export interface MLStockoutResult {
+  estimated_days_to_stockout: number;
+  risk_tier: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'HEALTHY';
+  risk_label: string;
+  description: string;
+  color: string;
+  is_critical: boolean;
+  algorithm: string;
+  inference_mode: string;
+}
+
+export interface MLAnomalyResult {
+  is_anomaly: boolean;
+  anomaly_score: number;
+  severity: 'CRITICAL' | 'WARNING' | 'NORMAL';
+  interpretation: string;
+}
+
+export type ReservationStatus = 
+  | 'PENDING' 
+  | 'ACCEPTED' 
+  | 'REJECTED' 
+  | 'READY_FOR_PICKUP' 
+  | 'COLLECTED' 
+  | 'EXPIRED' 
+  | 'CANCELLED';
+
+export interface CustomerReservation {
+  reservation_id: string;
+  customer_name: string;
+  customer_phone: string;
+  customer_email?: string;
+  pharmacy_id: string;
+  pharmacy_name: string;
+  medicine_id: string;
+  medicine_name: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  status: ReservationStatus;
+  created_at: string;
+  pickup_deadline: string;
+  prescription_verified: boolean;
+  prescription_url?: string;
+  notes?: string;
+}
+
+export type StockTransferStatus = 
+  | 'REQUESTED' 
+  | 'ACCEPTED' 
+  | 'REJECTED' 
+  | 'DISPATCHED' 
+  | 'IN_TRANSIT' 
+  | 'RECEIVED' 
+  | 'CANCELLED';
+
+export interface StockTransfer {
+  transfer_id: string;
+  from_pharmacy_id: string;
+  from_pharmacy_name: string;
+  to_pharmacy_id: string;
+  to_pharmacy_name: string;
+  medicine_id: string;
+  medicine_name: string;
+  quantity: number;
+  batch_number: string;
+  expiry_date: string;
+  status: StockTransferStatus;
+  requested_at: string;
+  dispatched_at?: string | null;
+  courier_partner?: string;
+  tracking_number?: string;
+  reason?: string;
+}
+
+export interface SurplusDeficitProposal {
+  medicine_id: string;
+  medicine_name: string;
+  deficit_pharmacy_id: string;
+  deficit_pharmacy_name: string;
+  deficit_current_stock: number;
+  surplus_pharmacy_id: string;
+  surplus_pharmacy_name: string;
+  surplus_current_stock: number;
+  recommended_quantity: number;
+  distance_km: number;
+  urgency: 'HIGH' | 'MEDIUM' | 'LOW';
+  reason: string;
+}
+
+export interface PrescriptionExtractedItem {
+  medicine_id: string;
+  medicine_name: string;
+  strength: string;
+  form: string;
+  category: string;
+  prescribed_quantity: number;
+  dosage_instruction: string;
+  unit_price: number;
+  subtotal: number;
+  ocr_confidence: number;
+  requires_prescription: boolean;
+}
+
+export interface PrescriptionPharmacyMatch {
+  pharmacy_id: string;
+  pharmacy_name: string;
+  address: string;
+  phone: string;
+  distance_km: number;
+  match_type: 'COMPLETE' | 'PARTIAL' | 'NONE';
+  matched_count: number;
+  total_prescribed: number;
+  estimated_total: number;
+  items_status: Array<{
+    medicine_id: string;
+    medicine_name: string;
+    prescribed_qty: number;
+    available_qty: number;
+    is_available: boolean;
+  }>;
+}
+
+export interface PrescriptionScanResult {
+  raw_text: string;
+  extracted_medicines_count: number;
+  extracted_items: PrescriptionExtractedItem[];
+  pharmacy_matches: PrescriptionPharmacyMatch[];
+  disclaimer: string;
+}
+
+export interface ExplainableAIFactor {
+  factor_name: string;
+  impact: string;
+  direction: string;
+  description: string;
+}
+
+export interface ExplainableAIResponse {
+  medicine_id: string;
+  medicine_name: string;
+  pharmacy_id: string;
+  confidence_score: number;
+  primary_recommendation: string;
+  contributing_factors: ExplainableAIFactor[];
+  methodology: string;
+}
+
+export interface SeasonalTrend {
+  category: string;
+  surge_percentage: string;
+  peak_months: string;
+  key_medicines: string[];
+  driver: string;
+}
+
+export interface SeasonalIntelligenceResponse {
+  current_season: string;
+  city: string;
+  active_demand_trends: SeasonalTrend[];
+  calendar_effects: {
+    weekend_multiplier: number;
+    weekend_explanation: string;
+    month_end_multiplier: number;
+    month_end_explanation: string;
+  };
+}

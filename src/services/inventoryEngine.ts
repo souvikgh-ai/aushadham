@@ -320,8 +320,8 @@ export function generateAIRecommendations(
       averageLeadTime: medicine.supplierLeadTime,
     };
 
-    // 1. CRITICAL RESTOCK: Stock runs out before supplier lead time!
-    if (daysToStockout !== null && daysToStockout <= medicine.supplierLeadTime) {
+    // 1. CRITICAL RESTOCK: Valid stock will exhaust before supplier lead time! (Only when velocity > 0)
+    if (ads > 0 && daysToStockout !== null && daysToStockout <= medicine.supplierLeadTime) {
       recommendations.push({
         id: `rec-crit-${medicine.id}`,
         medicineId: medicine.id,
@@ -376,8 +376,8 @@ export function generateAIRecommendations(
       continue;
     }
 
-    // 3. LOW STOCK: Stock below reorder point
-    if (currentStock <= reorderPoint || currentStock <= medicine.minimumStock) {
+    // 3. LOW STOCK: Active demand exists and stock is below reorder point
+    if (ads > 0 && (currentStock <= reorderPoint || currentStock <= medicine.minimumStock)) {
       recommendations.push({
         id: `rec-low-${medicine.id}`,
         medicineId: medicine.id,

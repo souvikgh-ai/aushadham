@@ -1,0 +1,46 @@
+{
+  "num_total_samples": 6420,
+  "train_samples": 4494,
+  "val_samples": 963,
+  "test_samples": 963,
+  "train_date_range": [
+    "2026-05-19 00:00:00",
+    "2026-08-01 00:00:00"
+  ],
+  "val_date_range": [
+    "2026-08-01 00:00:00",
+    "2026-08-17 00:00:00"
+  ],
+  "test_date_range": [
+    "2026-08-17 00:00:00",
+    "2026-09-02 00:00:00"
+  ],
+  "feature_columns": [
+    "lag_1",
+    "lag_2",
+    "lag_3",
+    "lag_7",
+    "lag_14",
+    "rolling_mean_7",
+    "rolling_std_7",
+    "rolling_mean_14",
+    "rolling_mean_30",
+    "velocity_ratio",
+    "closing_stock",
+    "days_of_supply",
+    "supplier_lead_time",
+    "safety_stock",
+    "day_of_week",
+    "month",
+    "is_weekend"
+  ],
+  "demand_targets": [
+    "target_demand_7d",
+    "target_demand_14d",
+    "target_demand_30d"
+  ],
+  "stockout_targets": [
+    "target_stockout_days",
+    "target_stockout_risk"
+  ]
+}
